@@ -1,0 +1,348 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base ────────────────────────────────────────────────────────────────── */
+
+@layer base {
+  :root {
+    --scrollbar-width: 6px;
+    --scrollbar-track: #f3f3f3;
+    --scrollbar-thumb: #d4d4d4;
+    --scrollbar-thumb-hover: #a3a3a3;
+    /* Safe area insets for notched phones */
+    --sat: env(safe-area-inset-top);
+    --sar: env(safe-area-inset-right);
+    --sab: env(safe-area-inset-bottom);
+    --sal: env(safe-area-inset-left);
+  }
+  /* iframes must fill their container */
+  iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .dark {
+    --scrollbar-track: #111111;
+    --scrollbar-thumb: #2a2a2a;
+    --scrollbar-thumb-hover: #3a3a3a;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    /* Prevent iOS text size adjust */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Prevent elastic bounce scroll on iOS at root */
+    overscroll-behavior: none;
+    /* Fill the full viewport including safe areas */
+    height: -webkit-fill-available;
+  }
+
+  body {
+    background-color: #ffffff;
+    color: #0a0a0a;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    /* Prevent body from scrolling — app handles its own scroll */
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    height: -webkit-fill-available;
+    /* Prevent iOS tap highlight */
+    -webkit-tap-highlight-color: transparent;
+    /* Prevent iOS callout on long press */
+    -webkit-touch-callout: none;
+  }
+
+  .dark body {
+    background-color: #0a0a0a;
+    color: #f5f5f5;
+  }
+
+  /* Allow text selection in chat */
+  .selectable {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
+  }
+
+  /* Custom scrollbar — desktop only */
+  @media (hover: hover) {
+    ::-webkit-scrollbar { width: var(--scrollbar-width); height: var(--scrollbar-width); }
+    ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+    ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
+  }
+
+  :focus-visible {
+    outline: 2px solid #a3a3a3;
+    outline-offset: 2px;
+  }
+
+  ::selection { background-color: #e5e5e5; }
+  .dark ::selection { background-color: #404040; }
+}
+
+/* ── App layout ───────────────────────────────────────────────────────────── */
+
+@layer components {
+  /* Full-height app container */
+  .app-container {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    overflow: hidden;
+    /* Respect safe areas */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+    /* Critical for mobile touch scrolling */
+  .chat-scroll,
+  .scroll-area,
+  .sidebar-scroll {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    /* Allow vertical pan — do NOT set touch-action: none anywhere */
+    touch-action: pan-y;
+  }
+
+  /* Remove any touch-action: none from framer-motion */
+  [data-framer-component-type] {
+    touch-action: pan-y !important;
+  }
+
+  /* Scrollable panels — touch optimized */
+  .scroll-area {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+  }
+
+  /* Hide scrollbar on mobile */
+  @media (max-width: 768px) {
+    .scroll-area::-webkit-scrollbar { display: none; }
+    .scroll-area { scrollbar-width: none; }
+  }
+
+  .chat-scroll {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+  }
+
+  @media (max-width: 768px) {
+    .chat-scroll::-webkit-scrollbar { display: none; }
+    .chat-scroll { scrollbar-width: none; }
+  }
+
+  .sidebar-scroll {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  @media (max-width: 768px) {
+    .sidebar-scroll::-webkit-scrollbar { display: none; }
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+
+  /* Touch-friendly tap targets */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Prevent zoom on input focus (iOS) */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+
+  @media (min-width: 768px) {
+    input, textarea, select {
+      font-size: 14px !important;
+    }
+  }
+
+  /* Typing cursor */
+  .typing-cursor::after {
+    content: "▋";
+    animation: blink 0.75s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+}
+
+/* ── Markdown ─────────────────────────────────────────────────────────────── */
+
+@layer components {
+  .markdown-body {
+    font-size: 0.875rem;
+    line-height: 1.7;
+    color: #0a0a0a;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .dark .markdown-body { color: #f5f5f5; }
+
+  .markdown-body p { margin-bottom: 0.75rem; }
+  .markdown-body p:last-child { margin-bottom: 0; }
+
+  .markdown-body h1,
+  .markdown-body h2,
+  .markdown-body h3,
+  .markdown-body h4 {
+    font-weight: 600;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    color: #0a0a0a;
+  }
+  .dark .markdown-body h1,
+  .dark .markdown-body h2,
+  .dark .markdown-body h3,
+  .dark .markdown-body h4 { color: #fafafa; }
+
+  .markdown-body h1 { font-size: 1.25rem; }
+  .markdown-body h2 { font-size: 1.125rem; }
+  .markdown-body h3 { font-size: 1rem; }
+
+  .markdown-body ul,
+  .markdown-body ol { margin-bottom: 0.75rem; padding-left: 1.25rem; }
+  .markdown-body ul { list-style-type: disc; }
+  .markdown-body ol { list-style-type: decimal; }
+  .markdown-body li { margin-bottom: 0.25rem; }
+
+  .markdown-body strong { font-weight: 600; color: #0a0a0a; }
+  .dark .markdown-body strong { color: #fafafa; }
+  .markdown-body em { font-style: italic; }
+
+  .markdown-body blockquote {
+    border-left: 2px solid #d4d4d4;
+    padding-left: 0.75rem;
+    margin: 0.75rem 0;
+    color: #737373;
+    font-style: italic;
+  }
+  .dark .markdown-body blockquote { border-left-color: #404040; color: #a3a3a3; }
+
+  .markdown-body hr { border-color: #e5e5e5; margin: 1rem 0; }
+  .dark .markdown-body hr { border-color: #2a2a2a; }
+
+  /* Inline code */
+  .markdown-body code:not(pre code) {
+    background-color: #f3f3f3;
+    color: #262626;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.8em;
+    font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
+    word-break: break-all;
+  }
+  .dark .markdown-body code:not(pre code) {
+    background-color: #1a1a1a;
+    color: #e5e5e5;
+  }
+
+  /* Tables — horizontal scroll on mobile */
+  .markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.75rem 0;
+    font-size: 0.875rem;
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .markdown-body th {
+    background-color: #f3f3f3;
+    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border: 1px solid #e5e5e5;
+    white-space: nowrap;
+  }
+  .dark .markdown-body th {
+    background-color: #1a1a1a;
+    border-color: #2a2a2a;
+    color: #e5e5e5;
+  }
+
+  .markdown-body td {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #e5e5e5;
+    color: #525252;
+  }
+  .dark .markdown-body td { border-color: #2a2a2a; color: #a3a3a3; }
+
+  .markdown-body a {
+    color: #404040;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .dark .markdown-body a { color: #a3a3a3; }
+}
+
+/* ── Syntax highlighting ──────────────────────────────────────────────────── */
+
+.hljs                    { background: transparent; color: #262626; }
+.hljs-keyword,
+.hljs-selector-tag       { color: #171717; font-weight: 600; }
+.hljs-string,
+.hljs-attr               { color: #525252; }
+.hljs-number,
+.hljs-literal            { color: #737373; }
+.hljs-comment            { color: #a3a3a3; font-style: italic; }
+.hljs-title,
+.hljs-name               { color: #171717; font-weight: 600; }
+.hljs-type               { color: #404040; }
+.hljs-built_in           { color: #525252; }
+.hljs-variable           { color: #404040; }
+.hljs-function           { color: #262626; }
+
+.dark .hljs              { color: #e5e5e5; }
+.dark .hljs-keyword,
+.dark .hljs-selector-tag { color: #fafafa; font-weight: 600; }
+.dark .hljs-string,
+.dark .hljs-attr         { color: #a3a3a3; }
+.dark .hljs-number,
+.dark .hljs-literal      { color: #737373; }
+.dark .hljs-comment      { color: #525252; font-style: italic; }
+.dark .hljs-title,
+.dark .hljs-name         { color: #fafafa; font-weight: 600; }
+.dark .hljs-type         { color: #d4d4d4; }
+.dark .hljs-built_in     { color: #a3a3a3; }
+.dark .hljs-variable     { color: #d4d4d4; }
+.dark .hljs-function     { color: #e5e5e5; }
