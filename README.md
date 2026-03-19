@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="public/favicon.svg" width="80" height="80" alt="ORChat Logo" />
+<img src="assets/icon.png" width="80" height="80" alt="ORChat Logo" />
 
 # ORChat
 
