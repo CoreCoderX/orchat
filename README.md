@@ -19,7 +19,7 @@ all from one clean, fast interface. Available on **Web** and **Android**.
 
 ---
 
-<img src="public/og-image.svg" width="100%" alt="ORChat Preview" />
+<img src="public/og-image.png" width="100%" alt="ORChat Preview" />
 
 </div>
 
